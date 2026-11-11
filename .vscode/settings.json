@@ -1,0 +1,69 @@
+{
+  "terminal.integrated.defaultProfile.windows": "MSYS2",
+  "terminal.integrated.profiles.windows": {
+    "MSYS2": {
+      "path": "C:\\msys64\\usr\\bin\\bash.exe",
+      "args": [
+        "--login",
+        "-i"
+      ],
+      "env": {
+        "MSYSTEM": "MINGW64",
+        "CHERE_INVOKING": "1"
+      }
+    }
+  },
+  "actionButtons": {
+    "defaultColor": "#00bcd4",
+    "loadNpmCommands": false,
+    "commands": [
+      {
+        "name": "🔨 Build",
+        "color": "#388e3c",
+        "command": "${command:workbench.action.tasks.runTask}?build_firmware",
+        "tooltip": "CMake + Ninja 编译固件"
+      },
+      {
+        "name": "🧹 Clean",
+        "color": "#d32f2f",
+        "command": "${command:workbench.action.tasks.runTask}?clean_build",
+        "tooltip": "清除构建缓存"
+      },
+      {
+        "name": "⚡ Flash (OpenOCD)",
+        "color": "#1976d2",
+        "command": "${command:workbench.action.tasks.runTask}?flash_openocd",
+        "tooltip": "通过 ST-Link + OpenOCD 烧录"
+      },
+      {
+        "name": "⚡ Flash (J-Link)",
+        "color": "#7b1fa2",
+        "command": "${command:workbench.action.tasks.runTask}?flash_jlink",
+        "tooltip": "通过 J-Link 烧录"
+      }
+    ]
+  },
+  "VsCodeTaskButtons.tasks": [
+    {
+      "label": "🔨 Build",
+      "task": "build_firmware",
+      "tooltip": "CMake + Ninja 编译固件"
+    },
+    {
+      "label": "🧹 Clean",
+      "task": "clean_build",
+      "tooltip": "清除构建缓存"
+    },
+    {
+      "label": "⚡ Flash (OpenOCD)",
+      "task": "flash_openocd",
+      "tooltip": "通过 ST-Link + OpenOCD 烧录"
+    },
+    {
+      "label": "⚡ Flash (J-Link)",
+      "task": "flash_jlink",
+      "tooltip": "通过 J-Link 烧录"
+    }
+  ],
+  "cmake.configureOnOpen": false
+}

@@ -1,0 +1,6 @@
+r
+h
+loadfile build/stm32f103c8t6_firmware.hex
+r
+g
+qc
