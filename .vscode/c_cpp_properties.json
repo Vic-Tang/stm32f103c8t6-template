@@ -4,6 +4,7 @@
       "name": "STM32F103C8T6",
       "includePath": [
         "${workspaceFolder}/App/inc/**",
+        "${workspaceFolder}/BSP/inc/**",
         "${workspaceFolder}/MCAL/stm32f103/inc/**"
       ],
       "defines": [

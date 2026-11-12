@@ -1,47 +1,59 @@
 #include "main.h"
 #include "Hardware_Init.h"
-
-/**
- * @brief 板载 LED 指示灯配置 (PC13)
- * - STM32F103C8T6 核心板板载 LED 通常接在 PC13，低电平点亮，高电平熄灭。
- */
-#define LED_GPIO_PORT          GPIOC
-#define LED_GPIO_PIN           GPIO_PIN_13
-
-/* 常见板载 LED 为低电平点亮（灌电流接法），若为高电平点亮可对调电平宏 */
-#define LED_ON()               GPIO_ResetPin(LED_GPIO_PORT, LED_GPIO_PIN)
-#define LED_OFF()              GPIO_SetPin(LED_GPIO_PORT, LED_GPIO_PIN)
+#include "bsp_led.h"
+#include "oled.h"
 
 int main(void)
 {
-    /* 1. Low level MCAL Hardware Initialization (72MHz SysClk, SysTick 1ms) */
+    /* 1. 硬件层与板级层初始化 (72MHz时钟、SysTick定时器、LED、I2C与SH1106 OLED) */
     Hardware_EarlyInit();
+    LED_Init();
+    OLED_Init();
 
-    /* 2. Run Application logic */
+    /* 2. 进入应用层主逻辑 */
     return App_Main();
 }
 
 int App_Main(void)
 {
-    /* 1. 使能 GPIOC 外设时钟 */
-    RCC_EnableAPB2Periph(RCC_APB2ENR_IOPCEN);
+    uint32_t counter = 0;
 
-    /* 2. 初始化 PC13 为推挽输出模式 (最高速率 2MHz 足够 LED/信号指示且低功耗) */
-    GPIO_Init(LED_GPIO_PORT, LED_GPIO_PIN, GPIO_MODE_OUTPUT_PP, GPIO_SPEED_2MHZ);
+    /* while(1) 前完成首屏显示内容设置并开启 LED */
+    OLED_Clear();
+    OLED_ShowString(0, 0,  "STM32F103 SH1106", 16);  // 标题
+    OLED_ShowString(0, 20, "System Status: OK", 12); // 系统状态
+    OLED_ShowString(0, 36, "HelloWorld: LED ON ", 12);    // LED 指示
+    OLED_ShowString(0, 50, "Cycle Count: ", 12);     // 循环计数
+    OLED_ShowNum(78, 50, counter, 4, 12);
+    OLED_Update();
 
-    /* 初始状态：灭 */
-    LED_OFF();
+    LED_On();
 
-    /* Application loop: 周期 6s (亮 3s，灭 3s) */
+    /* while(1) 中每隔 1s 改变一次屏幕显示内容和 LED 状态 */
     while (1)
     {
-        /* 点亮 LED (低电平 0V)，保持 3 秒 */
-        LED_ON();
-        Delay_Ms(3000);
-
-        /* 熄灭 LED (高电平 3.3V)，保持 3 秒 */
-        LED_OFF();
+        /* 延时 1 秒 */
         Delay_Ms(1000);
+
+        counter++;
+
+        /* 翻转板载 LED 状态 */
+        LED_Toggle();
+
+        /* 同步改变屏幕上的显示内容 */
+        if (LED_GetState())
+        {
+            OLED_ShowString(0, 36, "HelloWorld: LED ON ", 12);
+        }
+        else
+        {
+            OLED_ShowString(0, 36, "HelloWorld: LED OFF", 12);
+        }
+
+        OLED_ShowNum(78, 50, counter, 4, 12);
+
+        /* 刷新显示到屏幕 */
+        OLED_Update();
     }
 
     return 0;

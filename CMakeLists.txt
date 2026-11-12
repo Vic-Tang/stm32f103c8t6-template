@@ -21,14 +21,16 @@ add_compile_definitions(STM32F103xB)
 # Include Directories
 include_directories(
     App/inc
+    BSP/inc
     MCAL/stm32f103/inc
 )
 
 # Source files
 file(GLOB_RECURSE APP_SOURCES "App/src/*.c" "App/src/*.cpp")
+file(GLOB_RECURSE BSP_SOURCES "BSP/src/*.c" "BSP/src/*.cpp")
 file(GLOB_RECURSE MCAL_SOURCES "MCAL/stm32f103/src/*.c" "MCAL/stm32f103/src/*.cpp" "MCAL/stm32f103/src/*.s")
 
-set(ALL_SOURCES ${APP_SOURCES} ${MCAL_SOURCES})
+set(ALL_SOURCES ${APP_SOURCES} ${BSP_SOURCES} ${MCAL_SOURCES})
 
 # Target Executable
 add_executable(${PROJECT_NAME}.elf ${ALL_SOURCES})

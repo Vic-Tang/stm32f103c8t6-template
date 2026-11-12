@@ -10,6 +10,7 @@ extern "C" {
 #include "mcal_rcc.h"
 #include "mcal_gpio.h"
 #include "mcal_systick.h"
+#include "mcal_i2c.h"
 
 /**
  * @brief Initialize low level MCU peripherals (72MHz Clock, SysTick, etc.)

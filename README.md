@@ -11,7 +11,16 @@
 │   ├── inc/
 │   │   └── main.h
 │   └── src/
-│       └── main.cpp             # 主业务逻辑入口
+│       └── main.cpp             # 主业务逻辑入口 (OLED 显示示例与 LED 控制)
+├── BSP/                         # 板级外设层
+│   ├── inc/
+│   │   ├── bsp_led.h            # 板载 LED 驱动 (PC13 控制接口)
+│   │   ├── oled.h               # OLED SH1106 / SSD1306 驱动 API (打点/字符串/数字/显存刷新)
+│   │   └── oled_font.h          # 6x8 与 8x16 ASCII 点阵字库
+│   └── src/
+│       ├── bsp_led.c
+│       ├── oled.c
+│       └── oled_font.c
 ├── MCAL/                        # 微控制器抽象层 (驱动与硬件支持)
 │   └── stm32f103/
 │       ├── inc/
@@ -19,11 +28,13 @@
 │       │   ├── mcal_rcc.h       # 72MHz 时钟树驱动
 │       │   ├── mcal_gpio.h      # GPIO 驱动 (CRL/CRH配置/高低电平翻转)
 │       │   ├── mcal_systick.h   # SysTick 1ms 硬件定时与微秒/毫秒精准延时
+│       │   ├── mcal_i2c.h       # 高速稳定通用 I2C 总线驱动 (支持自适应应答)
 │       │   └── Hardware_Init.h  # 底层统一初始化头文件
 │       └── src/
 │           ├── mcal_rcc.c
 │           ├── mcal_gpio.c
 │           ├── mcal_systick.c
+│           ├── mcal_i2c.c
 │           ├── Hardware_Init.c
 │           └── startup_stm32f103xb.s # GCC 启动向量表文件
 ├── cmake/
@@ -119,3 +130,27 @@
   GPIO_SetPin(GPIOC, GPIO_PIN_13);   // 输出高电平
   GPIO_TogglePin(GPIOC, GPIO_PIN_13);// 电平翻转
   ```
+
+* **I2C OLED 显示屏 (SSD1306 0.96寸 128x64)**：
+  - **硬件连线**：
+    | OLED 屏幕引脚 | 单片机引脚 | 说明 |
+    | :--- | :--- | :--- |
+    | **GND** | GND | 电源地 |
+    | **VCC** | 3.3V 或 5V | 模块电源（通常板载 3.3V LDO） |
+    | **SCL** | **PB6** | I2C 时钟线 (开漏输出，外设上拉) |
+    | **SDA** | **PB7** | I2C 数据线 (开漏输出，外设上拉) |
+
+  - **代码调用示例**：
+    ```c
+    #include "oled.h"
+
+    OLED_Init();     // 初始化 I2C 总线并配置 SSD1306
+    OLED_Clear();    // 清屏
+
+    // 在指定坐标 (x, y) 打印字符串，支持 16 (8x16 点阵) 与 12 (6x8 点阵)
+    OLED_ShowString(0, 0,  "STM32F103C8T6", 16);
+    OLED_ShowString(0, 16, "Hello World!", 16);
+    OLED_ShowNum(0, 32, 12345, 5, 16); // 显示数字
+
+    OLED_Update();   // 将显存缓冲区同步推送到屏幕物理显存
+    ```
